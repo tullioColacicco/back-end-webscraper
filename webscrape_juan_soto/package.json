@@ -1,0 +1,14 @@
+{
+  "name": "webscrape_juan_soto",
+  "version": "1.0.0",
+  "description": "using puppeteer to webscape yankees news",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tullio colacicco",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^23.9.0"
+  }
+}
