@@ -10,7 +10,7 @@ async function scrapeNews() {
   await page.goto("https://www.mlb.com/yankees/news", {
     waitUntil: "domcontentloaded",
   });
-
+  //*[@id="kp-wp-tab-overview"]/div[2]/div/div/div[2]/g-section-with-header/div[2]/div[2]/div/div[3]/div[1]/div/a/div/div[2]/div[2]
   // Wait for the necessary elements to load (this could be different depending on the site)
   await page.waitForSelector("article");
 
