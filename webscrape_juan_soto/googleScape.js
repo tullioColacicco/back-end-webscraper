@@ -8,7 +8,7 @@ async function scrapeNews() {
   // Navigate to a news website that has coverage of Juan Soto
   // For example, let's use Google News
   await page.goto(
-    "https://www.google.com/search?q=juan+soto&sca_esv=24d1c3d5cf171cb0&rlz=1C1CHBF_enUS773US773&biw=1164&bih=1279&tbm=nws&sxsrf=ADLYWIJksjKXuc1zJ2dD44rf5ibQaHcnsA:1733175181114&story=Gh4SHEp1YW4gU290byBmcmVlIGFnZW5jeSBydW1vcnMyMQonxoX3l_bdhNY7xcfm1tj7yauzAfXIqr3-26f-ywHb2bmZmemH_rsBEIKrlecMGAVyAhAC&fcs=ACgqzee-FWCM74_uru7XRITKs5oR5qb6Gw&sa=X&ved=2ahUKEwjo0YPYhIqKAxUQSjABHaaOPcsQ7IUHegQIBxAF",
+    "https://www.google.com/search?q=yankees&rlz=1C1CHBF_enUS773US773&oq=yan&gs_lcrp=EgZjaHJvbWUqDwgAECMYJxjjAhiABBiKBTIPCAAQIxgnGOMCGIAEGIoFMgwIARAuGCcYgAQYigUyBggCEEUYOzIGCAMQRRg5MgYIBBBFGDwyBggFEEUYPTIGCAYQRRg8MgYIBxBFGDzSAQc3NzNqMGo0qAIAsAIB&sourceid=chrome&ie=UTF-8",
     {
       waitUntil: "domcontentloaded",
     }

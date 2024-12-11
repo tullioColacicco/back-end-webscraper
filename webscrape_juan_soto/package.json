@@ -9,6 +9,8 @@
   "author": "tullio colacicco",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "^23.9.0"
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "puppeteer": "^23.10.3"
   }
 }
