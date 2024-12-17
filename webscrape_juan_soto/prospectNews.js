@@ -1,55 +1,100 @@
 const puppeteer = require("puppeteer");
+const express = require("express");
+const cors = require("cors");
 
-async function scrapePlayerCardMenu() {
-  // Launch the browser
-  const browser = await puppeteer.launch({ headless: false }); // Set to true for headless mode
-  const page = await browser.newPage();
+const app = express();
+const port = process.env.PORT || 3002;
 
-  // Navigate to the page you want to scrape
-  await page.goto(
-    "https://www.mlb.com/milb/prospects/yankees/jasson-dominguez-691176",
-    { waitUntil: "domcontentloaded" }
-  );
+// Use CORS to handle cross-origin requests
+app.use(cors());
 
-  // Wait for the element containing the class 'sc-bZQynM jWTqqF menu player-card__menu'
-  await page.waitForSelector(".sc-bZQynM.jWTqqF.menu.player-card__menu");
+// Declare a global variable to hold the browser instance
+let browser = null;
 
-  // Find and click the "News" button inside the menu
-  await page.evaluate(() => {
-    // Find the menu element with the specific class
-    const menuElement = document.querySelector(
-      ".sc-bZQynM.jWTqqF.menu.player-card__menu"
-    );
+// Start the server and launch Puppeteer browser once
+(async () => {
+  browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"], // Use these arguments for environments like Docker
+  });
 
-    if (!menuElement) {
-      return null; // If the menu element is not found, return null
-    }
-
-    // Find the "News" button inside the menu by its text content
-    const newsButton = [...menuElement.querySelectorAll("button")].find(
-      (button) => button.textContent.includes("News")
-    ); // Find the button with text "News"
-
-    if (newsButton) {
-      newsButton.click(); // Click the button if found
-    } else {
-      console.log("News button not found!");
+  // Endpoint to trigger the scraping function
+  app.get("/scrape", async (req, res) => {
+    try {
+      const scrapedData = await scrapePlayerCardMenu();
+      res.json(scrapedData); // Send the scraped data as JSON
+    } catch (error) {
+      console.error("Error scraping:", error);
+      res.status(500).json({ error: "An error occurred while scraping" });
     }
   });
-  await page.waitForSelector(".news-tab__list", { visible: true });
 
-  await page.waitForSelector(".sc-gZMcBi.jszDao.skeleton-container");
+  // Scraping function that uses the global browser instance
+  async function scrapePlayerCardMenu() {
+    const page = await browser.newPage(); // Create a new page for each request
 
-  // Get the content or any other properties of the element
-  const children = await page.$$eval(".news-tab__list > *", (elements) => {
-    // Return an array of text contents or other data for each child
-    return elements.map((el) => el.textContent); // Customize what data you need, here we are getting the text content of each child
+    try {
+      // Navigate to the page you want to scrape
+      await page.goto(
+        "https://www.mlb.com/milb/prospects/yankees/jasson-dominguez-691176",
+        {
+          waitUntil: "domcontentloaded",
+        }
+      );
+
+      // Wait for the element containing the class 'sc-bZQynM jWTqqF menu player-card__menu'
+      await page.waitForSelector(".sc-bZQynM.jWTqqF.menu.player-card__menu");
+
+      // Find and click the "News" button inside the menu
+      await page.evaluate(() => {
+        const menuElement = document.querySelector(
+          ".sc-bZQynM.jWTqqF.menu.player-card__menu"
+        );
+
+        if (!menuElement) {
+          return null; // If the menu element is not found, return null
+        }
+
+        const newsButton = [...menuElement.querySelectorAll("button")].find(
+          (button) => button.textContent.includes("News")
+        ); // Find the button with text "News"
+
+        if (newsButton) {
+          newsButton.click(); // Click the button if found
+        } else {
+          console.log("News button not found!");
+        }
+      });
+
+      // Wait for the news section to load
+      await page.waitForSelector(".news-tab__list", { visible: true });
+
+      // Get the content or any other properties of the element
+      const children = await page.$$eval(".news-tab__list > li", (elements) => {
+        return elements.map((el) => el.textContent); // Get text content of each list item
+      });
+
+      console.log("News-related links:", children);
+
+      return children; // Return the scraped data
+    } catch (error) {
+      console.error("Error during scraping:", error);
+      throw error; // Rethrow the error to be caught in the Express route
+    } finally {
+      // Optionally, close the page if necessary (you may want to keep it open for reuse)
+      await page.close();
+    }
+  }
+
+  // Start the Express server
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
   });
-  console.log("News-related links:", children);
+})();
 
-  // Close the browser
+// Ensure proper cleanup when server shuts down
+process.on("SIGINT", async () => {
+  console.log("Shutting down server...");
   await browser.close();
-}
-
-// Run the function
-scrapePlayerCardMenu().catch(console.error);
+  process.exit(0);
+});
