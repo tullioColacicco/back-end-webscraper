@@ -41,7 +41,9 @@ async function scrapeNews() {
         link.querySelector(".n0jPhd.ynAwRc.tNxQIb.nDgy9d")?.innerText ||
         "No description";
       const title = link.querySelector(".WlydOe")?.href || "No title link";
-      return { desc, title };
+      const date =
+        link.querySelector(".OSrXXb.rbYSKb.LfVVr")?.innerText || "No date";
+      return { desc, title, date };
     });
   });
 

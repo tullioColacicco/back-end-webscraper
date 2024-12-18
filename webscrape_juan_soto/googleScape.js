@@ -41,7 +41,8 @@ async function scrapeNews() {
     return Array.from(links).map((link) => {
       const desc = link.querySelector(".n0jPhd.ynAwRc.tNxQIb.nDgy9d").innerText;
       const title = link.querySelector(".WlydOe").href;
-      return { desc, title };
+      const date = link.querySelector(".OSrXXb.rbYSKb.LfVVr").innerText;
+      return { desc, title, date };
     });
   });
   //*** this gets anchor and description using evaluate */
