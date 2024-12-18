@@ -78,7 +78,7 @@ async function scrapePlayerCardMenu() {
           nodeType: child.nodeType, // 1 = Element, 3 = Text, 8 = Comment
           nodeName: child.nodeName,
           nodeClassName: child.className, // Tag name (e.g., 'DIV', 'SPAN', etc.)
-          nodeValue: child.textContent,
+          nodeValue: child.href,
           //   avg: avg, // Text content or value (for text nodes or comment nodes)
         };
       });

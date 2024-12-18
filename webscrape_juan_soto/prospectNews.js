@@ -71,7 +71,14 @@ let browser = null;
 
       // Get the content or any other properties of the element
       const children = await page.$$eval(".news-tab__list > li", (elements) => {
-        return elements.map((el) => el.textContent); // Get text content of each list item
+        // Map the elements to an array of objects containing both href and title
+        return elements.map((el) => {
+          const anchor = el.querySelector("a"); // Get the <a> element within each child
+          return {
+            href: anchor ? anchor.getAttribute("href") : null, // Get the href attribute
+            title: anchor ? anchor.getAttribute("title") : null, // Get the title attribute
+          };
+        });
       });
 
       console.log("News-related links:", children);
