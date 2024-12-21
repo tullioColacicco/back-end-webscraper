@@ -9,12 +9,48 @@ async function scrapeProspects() {
     waitUntil: "domcontentloaded",
   });
 
+  const cookieContainerSelector = "#onetrust-group-container";
+  await page.waitForSelector(cookieContainerSelector, { visible: true });
+
+  // Find the "OK" button within the cookie container and click it
+  const okButtonSelector = "#onetrust-accept-btn-handler"; // This is the typical ID for the "OK" button
+  await page.waitForSelector(okButtonSelector, { visible: true });
+
+  // Click the "OK" button to accept cookies
+  await page.click(okButtonSelector);
+
   // Extract the prospect data and interact with each row
   const prospects = [];
+  await page.waitForSelector(".load-more__container button");
+  const loadMoreButtonSelector = ".load-more__container button";
+
+  // Wait for all load more buttons to be available
+  await page.waitForSelector(loadMoreButtonSelector);
+  await page.evaluate(() => {
+    const menuElement = document.querySelector(".load-more__container");
+
+    if (!menuElement) {
+      return null; // If the menu element is not found, return null
+    }
+
+    const newsButton = [...menuElement.querySelectorAll("button")].find(
+      (button) => button.textContent.includes("Show Full List")
+    ); // Find the button with text "News"
+
+    if (newsButton) {
+      newsButton.click(); // Click the button if found
+    } else {
+      console.log("News button not found!");
+    }
+  });
 
   // Get the rows of the rankings table
-  const rows = await page.$$(".rankings__table.rankings__table--team tbody tr");
-
+  let rows = await page.$$(".rankings__table.rankings__table--team tbody tr");
+  await page.screenshot({
+    path: "screenshot.png", // Path to save the screenshot
+    fullPage: true, // Capture the entire page, not just the visible viewport
+  });
+  rows = rows.slice(0, 5);
   // Iterate through each row, click the prospect, and wait for the drawer to appear
   for (let row of rows) {
     const data = [];
@@ -25,26 +61,50 @@ async function scrapeProspects() {
 
     // Click the row to open the prospect's drawer
     console.log(`Clicking on ${name}...`);
-    await row.click();
-
+    await row.click({ timeout: 1000000 }); // Click on the row (adjust timeout as needed)
+    // await page.screenshot({
+    //   path: "screenshot.png", // Path to save the screenshot
+    //   fullPage: true, // Capture the entire page, not just the visible viewport
+    // });
     // Wait for the drawer to become visible
     console.log("Waiting for the drawer to appear...");
     // await page.waitForSelector(".sc-bZQynM.jWTqqF.menu.player-card__menu");
 
     // Extract data from the drawer (you can extract other elements here as needed)
-    const drawerData = await page.evaluate(() => {
-      const drawer = document.querySelector(
+    await page.evaluate(() => {
+      const menuElement = document.querySelector(
         ".sc-bZQynM.jWTqqF.menu.player-card__menu"
       );
 
-      return drawer ? drawer.innerHTML : null; // You can extract specific data from the drawer if needed
+      if (!menuElement) {
+        return null; // If the menu element is not found, return null
+      }
+
+      const newsButton = [...menuElement.querySelectorAll("button")].find(
+        (button) => button.textContent.includes("News")
+      ); // Find the button with text "News"
+
+      if (newsButton) {
+        newsButton.click(); // Click the button if found
+      } else {
+        console.log("News button not found!");
+      }
     });
 
+    const children = await page.$$eval(".news-tab__list > li", (elements) => {
+      // Map the elements to an array of objects containing both href and title
+      return elements.map((el) => {
+        const anchor = el.querySelector("a"); // Get the <a> element within each child
+        return {
+          href: anchor ? anchor.getAttribute("href") : null, // Get the href attribute
+          title: anchor ? anchor.getAttribute("title") : null, // Get the title attribute
+        };
+      });
+    });
     // Push the prospect's name and the drawer data into the prospects array
     prospects.push({
       name,
-      drawerData,
-      data,
+      children,
     });
 
     // Close the drawer by clicking outside or on a close button (if needed)
