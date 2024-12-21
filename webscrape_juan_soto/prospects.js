@@ -1,8 +1,7 @@
 const puppeteer = require("puppeteer");
 
 async function scrapeProspects() {
-  // Launch the browser
-  const browser = await puppeteer.launch({ headless: true }); // headless: true means the browser runs without UI.
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   // Navigate to the Yankees prospects page
@@ -10,44 +9,51 @@ async function scrapeProspects() {
     waitUntil: "domcontentloaded",
   });
 
-  // Wait for the rankings table to load (adjust if necessary)
-  await page.waitForSelector(".rankings__table.rankings__table--team"); // Wait for the table to appear
+  // Extract the prospect data and interact with each row
+  const prospects = [];
 
-  // Extract the prospect data
-  const prospects = await page.evaluate(() => {
+  // Get the rows of the rankings table
+  const rows = await page.$$(".rankings__table.rankings__table--team tbody tr");
+
+  // Iterate through each row, click the prospect, and wait for the drawer to appear
+  for (let row of rows) {
     const data = [];
-
-    // Select the rows in the rankings table
-    const rows = document.querySelectorAll(
-      ".rankings__table.rankings__table--team tbody tr"
+    // Extract the prospect name from the row
+    const name = await row.$eval(".prospect-headshot__name", (el) =>
+      el.innerText.trim()
     );
 
-    rows.forEach((row) => {
-      const nameElement = row.querySelector(".prospect-headshot__name"); // Adjust this based on the actual structure of the page
-      //   const rankElement = row.querySelector(".rank"); // Adjust this based on the actual structure
-      //   const positionElement = row.querySelector(".position"); // Adjust this if necessary
+    // Click the row to open the prospect's drawer
+    console.log(`Clicking on ${name}...`);
+    await row.click();
 
-      if (nameElement) {
-        const name = nameElement.innerText.trim();
-        // const rank = rankElement.innerText.trim();
-        // const position = positionElement.innerText.trim();
+    // Wait for the drawer to become visible
+    console.log("Waiting for the drawer to appear...");
+    // await page.waitForSelector(".sc-bZQynM.jWTqqF.menu.player-card__menu");
 
-        // Push the scraped data to the array
-        data.push({
-          name,
-        });
-      }
+    // Extract data from the drawer (you can extract other elements here as needed)
+    const drawerData = await page.evaluate(() => {
+      const drawer = document.querySelector(
+        ".sc-bZQynM.jWTqqF.menu.player-card__menu"
+      );
+
+      return drawer ? drawer.innerHTML : null; // You can extract specific data from the drawer if needed
     });
 
-    return data; // Return the extracted data to the main function
-  });
+    // Push the prospect's name and the drawer data into the prospects array
+    prospects.push({
+      name,
+      drawerData,
+      data,
+    });
 
-  // Log the extracted data
-  console.log(prospects);
+    // Close the drawer by clicking outside or on a close button (if needed)
+    // For example, if there's a close button in the drawer, you can do something like this:
+    // await page.click(".drawer-close-button"); // Adjust the selector as needed
+  }
 
-  // Close the browser
+  console.log(prospects); // Log the collected data
   await browser.close();
 }
 
-// Run the scraping function
 scrapeProspects().catch(console.error);
