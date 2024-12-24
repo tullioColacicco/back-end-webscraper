@@ -46,15 +46,11 @@ async function scrapeProspects() {
 
   // Get the rows of the rankings table
   let rows = await page.$$(".rankings__table.rankings__table--team tbody tr");
-  await page.screenshot({
-    path: "screenshot.png", // Path to save the screenshot
-    fullPage: true, // Capture the entire page, not just the visible viewport
-  });
-  rows = rows.slice(0, 5);
+
+  rows = rows.slice(0, 2);
   // Iterate through each row, click the prospect, and wait for the drawer to appear
   for (let row of rows) {
     const data = [];
-    let count = 0;
     // Extract the prospect name from the row
     const name = await row.$eval(".prospect-headshot__name", (el) =>
       el.innerText.trim()
@@ -91,10 +87,7 @@ async function scrapeProspects() {
         console.log("News button not found!");
       }
     });
-    await page.screenshot({
-      path: "screenshot.png", // Path to save the screenshot
-      fullPage: true, // Capture the entire page, not just the visible viewport
-    });
+
     const children = await page.$$eval(".news-tab__list > li", (elements) => {
       // Map the elements to an array of objects containing both href and title
       return elements.map((el) => {
@@ -105,24 +98,45 @@ async function scrapeProspects() {
         };
       });
     });
-    await page.screenshot({
-      path: `screenshot_${name}.png`, // Unique filename per prospect
-      fullPage: true,
-    });
     // Push the prospect's name and the drawer data into the prospects array
     prospects.push({
       name,
       children,
     });
+    await page.evaluate(() => {
+      const menuElement = document.querySelector(
+        ".sc-bZQynM.jWTqqF.menu.player-card__menu"
+      );
 
-    // Use a more efficient CSS selector, without repeating the 'div' tag unless necessary
-    await page.click(".drawer__close-container__stylized-button");
+      if (!menuElement) {
+        return null; // If the menu element is not found, return null
+      }
 
-    await page.waitForSelector(
-      ".rankings__table.rankings__table--team tbody tr",
-      { visible: true }
-    );
+      const bioButton = [...menuElement.querySelectorAll("button")].find(
+        (button) => button.textContent.includes("Bio")
+      ); // Find the button with text "News"
 
+      if (bioButton) {
+        bioButton.click(); // Click the button if found
+      } else {
+        console.log("Bio button not found!");
+      }
+    });
+    await page.screenshot({
+      path: "screenshot.png", // Path to save the screenshot
+      fullPage: true, // Capture the entire page, not just the visible viewport
+    });
+    const bioStats = await page.evaluate(() => {
+      const bioLists = document.querySelectorAll(
+        ".Styles__BioTabContainer-sc-1vyfrup-0.cqSVQY.bio-tab__container ul li div"
+      );
+      const age = bioLists[0].innerHTML;
+      const ageNumber = bioLists[1].innerHTML;
+      return { age, ageNumber };
+    });
+    prospects.push({
+      bioStats,
+    });
     // Close the drawer by clicking outside or on a close button (if needed)
     // For example, if there's a close button in the drawer, you can do something like this:
     // await page.click(".drawer-close-button"); // Adjust the selector as needed
