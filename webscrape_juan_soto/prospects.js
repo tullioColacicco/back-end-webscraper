@@ -105,10 +105,7 @@ async function scrapeProspects() {
         };
       });
     });
-    await page.screenshot({
-      path: `screenshot_${name}.png`, // Unique filename per prospect
-      fullPage: true,
-    });
+
     // Push the prospect's name and the drawer data into the prospects array
     prospects.push({
       name,
@@ -116,13 +113,17 @@ async function scrapeProspects() {
     });
 
     // Use a more efficient CSS selector, without repeating the 'div' tag unless necessary
-    await page.click(".drawer__close-container__stylized-button");
+    await page.click(".drawer__close-container", {
+      timeout: 10000000,
+    }); // Click on the "Next" button to move to the next prospect
 
-    await page.waitForSelector(
-      ".rankings__table.rankings__table--team tbody tr",
-      { visible: true }
-    );
-
+    // await page.waitForSelector(".player-cardnews-tab__list", {
+    //   visible: true,
+    // });
+    await page.screenshot({
+      path: `screenshot_${name}.png`, // Unique filename per prospect
+      fullPage: true,
+    });
     // Close the drawer by clicking outside or on a close button (if needed)
     // For example, if there's a close button in the drawer, you can do something like this:
     // await page.click(".drawer-close-button"); // Adjust the selector as needed
