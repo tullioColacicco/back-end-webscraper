@@ -144,7 +144,7 @@ let browser = null;
 
       // Use a more efficient CSS selector, without repeating the 'div' tag unless necessary
       await page.click(".drawer__close-container", {
-        timeout: 10000000,
+        timeout: 100000000,
       }); // Click on the "Next" button to move to the next prospect
 
       // await page.waitForSelector(".player-card-navigation__next-container", {

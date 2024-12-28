@@ -114,10 +114,10 @@ async function scrapeProspects() {
 
     // Use a more efficient CSS selector, without repeating the 'div' tag unless necessary
     await page.click(".drawer__close-container", {
-      timeout: 10000000,
+      timeout: 1000000000,
     }); // Click on the "Next" button to move to the next prospect
 
-    // await page.waitForSelector(".player-cardnews-tab__list", {
+    // await page.waitForSelector(".drawer__close-container", {
     //   visible: true,
     // });
     await page.screenshot({
