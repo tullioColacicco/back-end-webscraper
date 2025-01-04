@@ -43,7 +43,11 @@ async function scrapeNews() {
       const title = link.querySelector(".WlydOe")?.href || "No title link";
       const date =
         link.querySelector(".OSrXXb.rbYSKb.LfVVr")?.innerText || "No date";
-      return { desc, title, date };
+      // Search for the nested image
+      const imgElement = link.querySelector("img");
+      const image = imgElement?.src || "No image found";
+
+      return { desc, title, date, image };
     });
   });
   const elements = await page.evaluate(() => {
