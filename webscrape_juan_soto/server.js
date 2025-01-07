@@ -2,10 +2,15 @@ const puppeteer = require("puppeteer");
 
 async function scrapeNews() {
   // Launch Puppeteer
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  // Specify the executable path for Render's Chromium (might vary based on your environment)
+
+  const browser =
+    await // Specify the executable path for Render's Chromium (might vary based on your environment)
+    puppeteer.launch({
+      executablePath:
+        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser", // Default path for Render
+      headless: true,
+    });
 
   const page = await browser.newPage();
 

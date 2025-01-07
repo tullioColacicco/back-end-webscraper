@@ -2,9 +2,10 @@ const puppeteer = require("puppeteer");
 
 // Scraping function that uses the global browser instance
 async function scrapePlayerCardMenu() {
-  const browser = await puppeteer.launch({
+  const browser = await ppuppeteer.launch({
+    executablePath:
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser", // Default path for Render
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
   const page = await browser.newPage();
