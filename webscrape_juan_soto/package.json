@@ -1,16 +1,14 @@
 {
   "name": "webscrape_juan_soto",
   "version": "1.0.0",
-  "description": "using puppeteer to webscape yankees news",
+  "description": "using puppeteer to web scrape yankees news",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    
-  "postinstall": "npx puppeteer install",
-
+    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npx puppeteer install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "tullio colacicco",
+  "author": "Tullio Colacicco",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
