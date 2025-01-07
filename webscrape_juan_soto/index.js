@@ -1,46 +1,63 @@
-const puppeteer = require("puppeteer");
+const express = require("express");
+const cors = require("cors");
 
-async function scrapeNews() {
-  // Launch Puppeteer
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
+// Import scrapers
+// const scrapeGoogle = require("./expressTest");
+const scrapeGoogle = require("./server");
+const scrapeProspects = require("./expressTest");
+const scrapeRoster = require("./roster");
+const app = express();
+const port = process.env.PORT || 3000;
 
-  // Navigate to a news website that has coverage of Juan Soto
-  // For example, let's use Google News
-  await page.goto("https://www.mlb.com/yankees/news", {
-    waitUntil: "domcontentloaded",
-  });
-  //*[@id="kp-wp-tab-overview"]/div[2]/div/div/div[2]/g-section-with-header/div[2]/div[2]/div/div[3]/div[1]/div/a/div/div[2]/div[2]
-  // Wait for the necessary elements to load (this could be different depending on the site)
-  await page.waitForSelector("article");
+app.use(cors());
 
-  // Scrape the headlines and links of the articles
-  const articles = await page.evaluate(() => {
-    const newsItems = [];
-    const articleElements = document.querySelectorAll("article");
+app.get("/scrapeRoster", async (req, res) => {
+  try {
+    console.log("Scraping started...");
+    const data = await scrapeRoster();
+    console.log("Scraped data:", data);
+    res.json(data);
+  } catch (err) {
+    console.error("Error during scraping:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to scrape data", message: err.message });
+  }
+});
 
-    articleElements.forEach((article) => {
-      const title = article.querySelector("h1")
-        ? article.querySelector("h1").innerText
-        : null;
-      const link = article.querySelector("a")
-        ? article.querySelector("a").href
-        : null;
+app.get("/scrapeProspects", async (req, res) => {
+  try {
+    console.log("Scraping started...");
+    const data = await scrapeProspects();
+    console.log("Scraped data:", data);
+    res.json(data);
+  } catch (err) {
+    console.error("Error during scraping:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to scrape data", message: err.message });
+  }
+});
 
-      if (title && link) {
-        newsItems.push({ title, link });
-      }
-    });
+app.get("/scrapeGoogle", async (req, res) => {
+  try {
+    console.log("Scraping started...");
+    const data = await scrapeGoogle();
+    console.log("Scraped data:", data);
+    res.json(data);
+  } catch (err) {
+    console.error("Error during scraping:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to scrape data", message: err.message });
+  }
+});
 
-    return newsItems;
-  });
+// Root endpoint
+app.get("/", (req, res) => {
+  res.send("Welcome to the Scraping API!");
+});
 
-  // Print the scraped data
-  console.log(articles);
-
-  // Close the browser
-  await browser.close();
-}
-
-// Run the function
-scrapeNews().catch(console.error);
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});

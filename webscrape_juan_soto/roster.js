@@ -1,28 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-
 const puppeteer = require("puppeteer");
-
-const app = express();
-const port = process.env.PORT || 3003;
-app.use(cors());
-
-// Endpoint to trigger the scraping function
-app.get("/scrape", async (req, res) => {
-  try {
-    // Call your existing scrapeNews function
-    const scrapedData = await scrapeRoster();
-    res.json(scrapedData); // Send the scraped data as JSON
-  } catch (error) {
-    console.error("Error scraping:", error);
-    res.status(500).json({ error: "An error occurred while scraping" });
-  }
-});
 
 // Your existing scrapeNews function with minor modifications
 async function scrapeRoster() {
   // Launch Puppeteer
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+
   const page = await browser.newPage();
 
   // Navigate to the MLB Yankees roster page
@@ -60,7 +45,12 @@ async function scrapeRoster() {
   await browser.close();
 }
 
-// Start the Express server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+scrapeRoster()
+  .then((data) => {
+    console.log("Scraping complete. Data:", data);
+  })
+  .catch((error) => {
+    console.error("Scraping failed:", error);
+  });
+
+module.exports = scrapeRoster;
