@@ -4,13 +4,11 @@ async function scrapeNews() {
   // Launch Puppeteer
   // Specify the executable path for Render's Chromium (might vary based on your environment)
 
-  const browser =
-    await // Specify the executable path for Render's Chromium (might vary based on your environment)
-    puppeteer.launch({
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser", // Default path for Render
-      headless: true,
-    });
+  const browser = await puppeteer.launch({
+    executablePath:
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
+    headless: true,
+  });
 
   const page = await browser.newPage();
 

@@ -5,7 +5,7 @@ async function scrapeRoster() {
   // Launch Puppeteer
   const browser = await puppeteer.launch({
     executablePath:
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser", // Default path for Render
+      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
     headless: true,
   });
 
