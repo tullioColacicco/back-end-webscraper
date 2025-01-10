@@ -10,6 +10,8 @@ async function scrapeRoster() {
     args: [
       "--no-sandbox", // Required to run as root in Docker
       "--disable-setuid-sandbox", // Prevents sandboxing issues
+      "--single-process", // Enforce single process (no additional process for tabs)
+      "--no-zygote", // Disable the zygote process for predictable performance
     ],
   });
   //test
@@ -17,11 +19,11 @@ async function scrapeRoster() {
 
   // Navigate to the MLB Yankees roster page
   await page.goto("https://www.mlb.com/yankees/roster", {
-    waitUntil: "load",
+    waitUntil: "domcontentloaded",
   });
 
   // Wait for the roster table to load
-  await page.waitForSelector(".roster__table", { timeout: 60000 }); // 60 seconds
+  await page.waitForSelector(".roster__table"); // 60 seconds
 
   // Extract data from all rows, including text and image sources
   const allRows = await page.evaluate(() => {
