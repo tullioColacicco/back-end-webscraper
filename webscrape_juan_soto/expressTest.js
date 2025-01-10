@@ -6,6 +6,10 @@ async function scrapePlayerCardMenu() {
     executablePath:
       process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
     headless: true,
+    args: [
+      "--no-sandbox", // Required to run as root in Docker
+      "--disable-setuid-sandbox", // Prevents sandboxing issues
+    ],
   });
   const page = await browser.newPage();
 
