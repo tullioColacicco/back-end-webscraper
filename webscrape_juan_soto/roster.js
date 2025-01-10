@@ -17,7 +17,7 @@ async function scrapeRoster() {
 
   // Navigate to the MLB Yankees roster page
   await page.goto("https://www.mlb.com/yankees/roster", {
-    waitUntil: "domcontentloaded",
+    waitUntil: "load",
   });
 
   // Wait for the roster table to load
