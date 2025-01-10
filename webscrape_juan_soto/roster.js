@@ -4,11 +4,10 @@ const puppeteer = require("puppeteer");
 async function scrapeRoster() {
   // Launch Puppeteer
   const browser = await puppeteer.launch({
-    executablePath:
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Use the environment variable
     headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
-
   const page = await browser.newPage();
 
   // Navigate to the MLB Yankees roster page
