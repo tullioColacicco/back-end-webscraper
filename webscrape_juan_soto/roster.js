@@ -21,7 +21,7 @@ async function scrapeRoster() {
   });
 
   // Wait for the roster table to load
-  await page.waitForSelector(".roster__table");
+  await page.waitForSelector(".roster__table", { timeout: 60000 }); // 60 seconds
 
   // Extract data from all rows, including text and image sources
   const allRows = await page.evaluate(() => {
