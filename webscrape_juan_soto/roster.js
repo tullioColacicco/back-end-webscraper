@@ -8,7 +8,7 @@ async function scrapeRoster() {
       process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
     headless: true,
   });
-
+  //test
   const page = await browser.newPage();
 
   // Navigate to the MLB Yankees roster page
