@@ -3,8 +3,6 @@ const puppeteer = require("puppeteer");
 // Scraping function that uses the global browser instance
 async function scrapePlayerCardMenu() {
   const browser = await puppeteer.launch({
-    executablePath:
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
     headless: true,
     args: [
       "--no-sandbox", // Required to run as root in Docker

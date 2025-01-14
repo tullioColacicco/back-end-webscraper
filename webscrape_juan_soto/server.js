@@ -5,8 +5,6 @@ async function scrapeNews() {
   // Specify the executable path for Render's Chromium (might vary based on your environment)
 
   const browser = await puppeteer.launch({
-    executablePath:
-      process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable", // Common path for Render
     headless: true,
     args: [
       "--no-sandbox", // Required to run as root in Docker
